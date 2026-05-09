@@ -2,6 +2,7 @@
 #include <string>
 #include <cstdlib> //srand()
 #include <ctime> //time(0)
+#include <vector> // vector = dynamicke pole 
 
 using namespace std;
 // promeny k postave
@@ -41,7 +42,7 @@ void levelUp(Postava &p) {
     int potreba = p.level * 10;
 
     if (p.exp >= potreba) {
-        p.level++;
+        p.level++; 
         p.exp = 0;
         p.maxZivoty += 5;
         p.utok += 2;
@@ -90,4 +91,144 @@ void vesnice(Postava &p, int cislo) {
         }
     } while (volba != 4);
 }
+// souboj
+bool souboj(Postava &p, vector<Nepritel> nepratele, bool boss = false) { // vektor = dynamicke pole ktere muze mit libovolny pocet prvku
+    cout << "\n===== Zacina SOUBOJ =====\n";
 
+    int infekce = 0;
+    int bezLeceni = 0;
+
+      while (p.zivoty > 0 && !nepratele.empty()) {
+
+        // Infekce
+        if (boss && infekce > 0) {
+            int damage = (rand() % 3 + 1) * infekce;
+            p.zivoty -= damage;
+            cout << "Infekce dava " << damage << " damage! (stacky: " << infekce << ")\n";
+        }
+
+        cout << "\nzivoty: " << p.zivoty << "/" << p.maxZivoty << endl;
+        cout << "1. Utok\n2. Leceni (5 many)\n";
+        int akce;
+        cin >> akce;
+
+        if (akce == 2 && p.mana >= 5) {
+        p.mana -= 5;
+        p.zivoty += 10;
+            if (p.zivoty > p.maxZivoty) p.zivoty = p.maxZivoty;
+           
+                cout << "Vylecil ses!\n";
+            if (infekce > 0) infekce--;
+            bezLeceni = 0;
+        } else {
+            bezLeceni++;
+
+            cout << "\nNepratele:\n";
+            for (int i = 0; i < nepratele.size(); i++) {
+                cout << i + 1 << ". " << nepratele[i].jmeno
+                     << " Zivoty: " << nepratele[i].zivoty_n << endl;
+            }
+             int cil;
+            cin >> cil;
+            cil--;
+             if (cil >= 0 && cil < nepratele.size()) {
+                nepratele[cil].zivoty_n -= p.utok;
+                cout << "Utok za " << p.utok << endl;
+
+                if (nepratele[cil].zivoty_n <= 0) {
+                    cout << nepratele[cil].jmeno << " zemrel!\n";
+                    p.zlato += nepratele[cil].odmena;
+                    p.exp += 5;
+                    nepratele.erase(nepratele.begin() + cil); // .erase vymazu prvek uprostred 
+                }
+            }
+        }
+   // utok nepratel
+        for (auto &n : nepratele) {
+            p.zivoty -= n.utok_n;
+            cout << n.jmeno << " utoci za " << n.utok_n << endl;
+
+            if (boss) {
+                infekce = min(infekce + 1, 5); // min vraci mensi prvek
+            }
+        }
+ // bonus utok
+        if (boss && bezLeceni >= 3 && !nepratele.empty()) {
+            cout << "BOSS dava bonusovy utok!\n";
+            p.zivoty -= nepratele[0].utok_n;
+        }
+    }
+    if (p.zivoty <= 0) {
+        cout << "\nProhral jsi!\n";
+        return false;
+    }
+
+    cout << "\nVyhral jsi!\n";
+    levelUp(p);
+    return true;
+}
+// ===== VYBER CLASSY =====
+Postava vyberrasy() {
+    Postava p;
+    cout << "Zadej jmeno: ";
+    cin >> p.jmeno;
+
+       int volba;
+    do {
+        cout << "\nVyber Rasu/povolani:\n";
+        cout << "1. Valecnik\n2. Lucistnik\n3. Carodej\n4. Tank\n";
+        cin >> volba;
+
+        switch (volba) {
+        case 1:
+            p.rasa = "Valecnik";
+            p.maxZivoty = 30;
+            p.maxMana = 10;
+            p.utok = 7;
+            break;
+        case 2:
+            p.rasa = "Lucistnik";
+            p.maxZivoty = 25;
+            p.maxMana = 15;
+            p.utok = 8;
+            break;
+        case 3:
+            p.rasa = "Carodej";
+            p.maxZivoty = 20;
+            p.maxMana = 30;
+            p.utok = 10;
+            break;
+        case 4:
+            p.rasa = "Tank";
+            p.maxZivoty = 40;
+            p.maxMana = 5;
+            p.utok = 5;
+            break;
+        }
+    } while (volba < 1 || volba > 4);
+
+    p.zivoty = p.maxZivoty;
+    p.mana = p.maxMana;
+    p.zlato = 20;
+    p.level = 1;
+    p.exp = 0;
+
+    return p;
+}
+    // ===== MAIN =====
+int main() {
+    srand(time(0));
+
+    Postava postava = vyberrasy();
+
+    vector<vector<Nepritel>> mapa = {
+        {{"Goblin", 10, 3, 5}},
+        {{"Vlk", 10, 3, 5}, {"Netopyr", 8, 2, 4}},
+        {{"Kostlivec", 12, 4, 6}, {"Zombie", 12, 4, 6}, {"Krysa", 8, 2, 3}},
+        {{"MiniBoss Obr", 25, 6, 20}},
+        {{"Ork", 15, 5, 8}},
+        {{"Bandita", 14, 5, 8}, {"Pavouk", 10, 3, 5}},
+        {{"MiniBoss Rytir", 30, 7, 25}},
+        {{"Plaguevile", 60, 12, 150}} // HLAVNI BOSS
+    };
+}
