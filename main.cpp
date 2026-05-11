@@ -18,7 +18,7 @@ struct Postava {
     int level;
     int exp;
 };
-// promene k nepriteli
+// promene k nepriteli //NIGGER
 struct Nepritel {
     string jmeno;
     int zivoty_n;
