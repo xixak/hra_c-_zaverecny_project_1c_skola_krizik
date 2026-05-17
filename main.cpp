@@ -25,12 +25,36 @@ struct Nepritel {
     int utok_n;
     int odmena;
 };
+// PRIBEH 
+void uvod() {
+    cout << "=====================================\n";
+    cout << "        KRALOVSTVI ELDOR\n";
+    cout << "=====================================\n\n";
+
+    cout << "Kdysi bylo kralovstvi Eldor mistem miru.\n";
+    cout << "Lide zili bezpecne a magie slouzila dobru.\n\n";
+
+    cout << "Jednoho dne se ale na severu objevila\n";
+    cout << "temna nemoc zvana Morova nakaza.\n\n";
+
+    cout << "Lesy umiraly, lide mizeli a mrtvi\n";
+    cout << "vstavali znovu jako nestvury.\n\n";
+
+    cout << "Za vse muze pradavna bytost:\n";
+    cout << "PLAGUEVILE.\n\n";
+
+    cout << "Mnoho hrdinu se pokusilo zastavit\n";
+    cout << "temnotu, ale nikdo se nevratil.\n\n";
+
+    cout << "Ted prichazis TY.\n";
+    cout << "Osud kralovstvi je ve tvych rukou.\n\n";
+}
 // Funkce na vypis statu postavy
 void vypisStaty(Postava p) {
     cout << "\n===== HRAC =====\n";
     cout << "Jmeno: " << p.jmeno << endl;
     cout << "rasa: " << p.rasa << endl;
-    cout << "Zivoty: " << p.zivoty << "/" << p.maxZivoty << endl;
+    hpBar(p.zivoty, p.maxZivoty);
     cout << "Mana: " << p.mana << "/" << p.maxMana << endl;
     cout << "Zlato: " << p.zlato << endl;
     cout << "Level: " << p.level << endl;
@@ -55,6 +79,8 @@ void levelUp(Postava &p) {
 }
 // vesnice
 void vesnice(Postava &p, int cislo) {
+    cout << "\nDorazil jsi do vesnice.\n";
+    cout << "Mistni obyvatel ti nabizi pomoc.\n";
     int volba;
 
     do {
@@ -70,7 +96,9 @@ void vesnice(Postava &p, int cislo) {
             if (p.zlato >= 5) {
                 p.zlato -= 5;
                 p.zivoty = p.maxZivoty;
-                cout << "Zivoty doplneny.\n";
+                cout << "Byl jsi vylecen.\n";
+            }else {
+                cout << "nemas dost zlata.\n";
             }
             break;
         case 2:
@@ -78,14 +106,18 @@ void vesnice(Postava &p, int cislo) {
                 p.zlato -= 15;
                 p.maxZivoty += 5;
                 p.zivoty = p.maxZivoty;
-                cout << "Max zivoty zvyseno.\n";
+                cout << "tvoje odolnost se zvysila.\n";
+            }else {
+                cout << "nemas dost zlata.\n";
             }
             break;
         case 3:
             if (p.zlato >= 20) {
                 p.zlato -= 20;
                 p.utok += 2;
-                cout << "Utok zvysen.\n";
+                cout << "Tvoje sila je vetsi.\n";
+            }else {
+                cout << "nemas dost zlata.\n";
             }
             break;
         }
@@ -100,74 +132,82 @@ bool souboj(Postava &p, vector<Nepritel> nepratele, bool boss = false) { // vekt
 
       while (p.zivoty > 0 && !nepratele.empty()) {
 
-        // Infekce
+// Infekce
         if (boss && infekce > 0) {
             int damage = (rand() % 3 + 1) * infekce;
             p.zivoty -= damage;
             cout << "Infekce dava " << damage << " damage! (stacky: " << infekce << ")\n";
         }
 
-        cout << "\nzivoty: " << p.zivoty << "/" << p.maxZivoty << endl;
+        cout << endl;
+        hpBar(p.zivoty, p.maxZivoty);
         cout << "1. Utok\n2. Leceni (5 many)\n";
         int akce;
         cin >> akce;
-
+// LECENI
         if (akce == 2 && p.mana >= 5) {
         p.mana -= 5;
         p.zivoty += 10;
             if (p.zivoty > p.maxZivoty) p.zivoty = p.maxZivoty;
-           
                 cout << "Vylecil ses!\n";
-            if (infekce > 0) infekce--;
+            if (infekce > 0) {
+            infekce--;
+            }
             bezLeceni = 0;
+// UTOK
         } else {
             bezLeceni++;
 
             cout << "\nNepratele:\n";
             for (int i = 0; i < nepratele.size(); i++) {
-                cout << i + 1 << ". " << nepratele[i].jmeno
-                     << " Zivoty: " << nepratele[i].zivoty_n << endl;
+                cout << i + 1 << ". " << nepratele[i].jmeno << " Zivoty: " << nepratele[i].zivoty_n << endl;
             }
              int cil;
+             cout << "\nvyber cil: ";
             cin >> cil;
             cil--;
              if (cil >= 0 && cil < nepratele.size()) {
                 nepratele[cil].zivoty_n -= p.utok;
-                cout << "Utok za " << p.utok << endl;
+                cout << "\nZasahl jsi nepritele za " << p.utok << "damage!\n";
 
                 if (nepratele[cil].zivoty_n <= 0) {
-                    cout << nepratele[cil].jmeno << " zemrel!\n";
+                    cout << nepratele[cil].jmeno << " byl porazen!\n";
                     p.zlato += nepratele[cil].odmena;
                     p.exp += 5;
                     nepratele.erase(nepratele.begin() + cil); // .erase vymazu prvek uprostred 
                 }
             }
         }
-   // utok nepratel
+// utok nepratel
         for (auto &n : nepratele) {
             p.zivoty -= n.utok_n;
-            cout << n.jmeno << " utoci za " << n.utok_n << endl;
-
+            cout << n.jmeno << " utoci za " << n.utok_n << "damage!\n";
+// boss infekce
             if (boss) {
                 infekce = min(infekce + 1, 5); // min vraci mensi prvek
+                cout << "byl jsi nakazen!\n";
             }
         }
- // bonus utok
+ // bonus utok bosse
         if (boss && bezLeceni >= 3 && !nepratele.empty()) {
-            cout << "BOSS dava bonusovy utok!\n";
+            cout << "Plaguevile pouziva bonusovy utok!\n";
             p.zivoty -= nepratele[0].utok_n;
         }
     }
+// prohra
     if (p.zivoty <= 0) {
-        cout << "\nProhral jsi!\n";
+        cout << "\n --------------------------------------\n";
+        cout << "-------------Prohral jsi!--------------\n";
+        cout << "-------------Eldor padl do temnoty...\n";
+        cout << "-----------------------------------------\n";
         return false;
     }
-
-    cout << "\nVyhral jsi!\n";
+// vyhra
+    cout << "\nVyhral jsi boj!\n";
     levelUp(p);
     return true;
 }
-// ===== VYBER CLASSY =====
+// ----- VYBER CLASSY -----
 Postava vyberrasy() {
     Postava p;
     cout << "Zadej jmeno: ";
@@ -215,12 +255,70 @@ Postava vyberrasy() {
 
     return p;
 }
-    // ===== MAIN =====
+// logo hry
+void logoHry() {
+    cout << R"(
+
+███████╗██╗     ██████╗  ██████╗ ██████╗
+██╔════╝██║     ██╔══██╗██╔═══██╗██╔══██╗
+█████╗  ██║     ██║  ██║██║   ██║██████╔╝
+██╔══╝  ██║     ██║  ██║██║   ██║██╔══██╗
+███████╗███████╗██████╔╝╚██████╔╝██║  ██║
+╚══════╝╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+
+)";
+}
+// oddelovac
+void oddelovac() {
+    cout << "\n=====================================\n";
+}
+// HP BAR
+void hpBar(int hp, int maxHp) {
+
+    int pocet = (hp * 20) / maxHp;
+
+    cout << "HP: [";
+
+    for (int i = 0; i < 20; i++) {
+
+        if (i < pocet)
+            cout << "#";
+        else
+            cout << "-";
+    }
+
+    cout << "] " << hp << "/" << maxHp << endl;
+}
+// BOSS INTRO
+void bossIntro() {
+
+    cout << R"(
+
+             .-.
+            (o.o)
+             |=|
+            __|__
+          //.=|=.\\
+         // .=|=. \\
+         \\\\ .=|=. //
+          \\\\(_=_)//
+           (:| |:)
+            || ||
+            () ()
+            || ||
+            || ||
+           ==' '==
+
+        PLAGUEVILE
+
+)";
+}
+    // ----- MAIN -----
 int main() {
     srand(time(0));
-
+    logoHry();
+    uvod();
     Postava postava = vyberrasy();
-
     vector<vector<Nepritel>> mapa = {
         {{"Goblin", 10, 3, 5}},
         {{"Vlk", 10, 3, 5}, {"Netopyr", 8, 2, 4}},
@@ -231,4 +329,49 @@ int main() {
         {{"MiniBoss Rytir", 30, 7, 25}},
         {{"Plaguevile", 60, 12, 150}} // HLAVNI BOSS
     };
+// ---- prubeh hry ----
+for (int i = 0; i < mapa.size();i++){
+    vypisStaty(postava);
+// vesnice 
+    if (i == 3)
+        vesnice(postava, 1);
+
+    if (i == 6)
+        vesnice(postava, 2);
+// pribeh pred bossem
+    if (i == mapa.size() - 1){
+        cout << "\n----------------------------------------\n";
+        cout << " Dorazil jsi do temne pevnosti.\n";
+        cout << " Vzduch je plny moru a smrti.\n";
+        cout << " Pred tebou stoji PLAGUEVILE.\n";
+        bossIntro();
+        cout << "----------------------------------------\n";
+    }
+    bool vysledek;
+// boss boj 
+    if (i == mapa.size() - 1)
+        vysledek = souboj(postava, mapa[i], true);
+    else 
+        vysledek = souboj(postava, mapa[i], false);
+    if (!vysledek)
+    return 0;
+}
+// ---- konec ----
+    cout << "\n----------------------------------------\n";
+    cout << R"(
+
+██╗   ██╗██╗   ██╗██╗  ██╗██████╗  █████╗
+██║   ██║╚██╗ ██╔╝██║  ██║██╔══██╗██╔══██╗
+██║   ██║ ╚████╔╝ ███████║██████╔╝███████║
+╚██╗ ██╔╝  ╚██╔╝  ██╔══██║██╔══██╗██╔══██║
+ ╚████╔╝    ██║   ██║  ██║██║  ██║██║  ██║
+  ╚═══╝     ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
+
+)";
+    cout << " Porazil jsi PLAGUEVILA!\n";
+    cout << " Eldor byl zachranen.\n";
+    cout << " Lide znovu mohou zit v miru.\n";
+    cout << "----------------------------------------\n";
+
+    return 0;
 }
