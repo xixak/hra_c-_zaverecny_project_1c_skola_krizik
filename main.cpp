@@ -71,7 +71,7 @@ void hpBar(int hp, int maxHp) {
 
         if (i < pocet){
             barva(cervena);
-            cout << "❤️ ";
+            cout << "& ";
         }else{
             barva(tmave_seda);
             cout << "-";
@@ -191,24 +191,57 @@ void pribehSouboje(int i) {
     break;
 
     case 4:
+        lokace("Vez temne magie");
+        cout << "Ve stinech stoji Temny Mag.\n";
+        cout << "Jeho oci zari fialovou energii.\n";
+    break;
+
+    case 5:
+        lokace("Jedovate močaly");
+        cout << "Z vody se plazi Jedovaty Had.\n";
+        cout << "Hovno kouka a smrdi.\n";
+    break;
+
+    case 6:
         lokace("Spalena vesnice");
         cout << "Domy jsou znicene.\n";
         cout << "Rozzuřeny Ork jde proti tobe.\n";
      break;
+
+     case 7:
+        lokace("Ledove hory");
+        cout << "Obrovsky Ledovy Golem blokuje cestu.\n";
+    break;
     
-     case 5:
+     case 8:
         lokace("Jedovate jeskyne");
         cout << "Ze tmy se ozve smich Bandity.\n";
         cout << "Vedle nej se plazi obrovsky Pavouk.\n";
     break;
 
-    case 6:
-        lokace("Padly rytir");
+    case 9:
+        lokace("Zakazane ruiny");
+        cout << "Nemrtvy Carodej sesila temna kouzla.\n";
+        cout << "Kouzelna hulka se na tebe blbe smeje.\n";
+    break;
+    
+    case 10:
+        lokace("Pekelna brana");
+        cout << "Z ohně vystupuje mocny Demon.\n";
+    break;
+
+    case 11:
+        lokace("Peklo Padly rytir");
         cout << "Pred tebou stoji nemrtvy rytir.\n";
         cout << "\"Osvobod me...\"\n";
     break;
 
-    case 7:
+    case 12:
+        lokace("Peklo Draci vrchol");
+        cout << "Oblohu zakryla kridla obrovskeho Draka.\n";
+    break;
+
+    case 13:
         lokace("Temna pevnost");
         cout << "Dorazil jsi na konec sve cesty.\n";
         cout << "Na trunu sedi PLAGUEVILE.\n";
@@ -366,7 +399,7 @@ if (boss && infekce > 0) {
                 if (nepratele[cil].zivoty_n <= 0) {
                     combatText(nepratele[cil].jmeno + " byl porazen!", zluta);
                     p.zlato += nepratele[cil].odmena;
-                    p.exp += 5;
+                    p.exp += 10;
                     nepratele.erase(nepratele.begin() + cil); // .erase vymazu prvek uprostred
                 }
             }
@@ -462,10 +495,16 @@ int main() {
         {{"Vlk", 10, 3, 5}, {"Netopyr", 8, 2, 4}},
         {{"Kostlivec", 12, 4, 8}, {"Zombie", 12, 4, 8}, {"Krysa", 8, 2, 7}},
         {{"MiniBoss Obr", 25, 6, 20}},
+        {{"Temny Mag", 18, 6, 15}},
+        {{"Jedovaty Had", 16, 5, 12},{"hovno", 20, 5, 15}},
         {{"Ork", 15, 5, 10}},
+        {{"MiniBossLedovy Golem", 35, 8, 40}},
         {{"Bandita", 14, 5, 8}, {"Pavouk", 10, 3, 10}},
+        {{"MiniBoss Kouzelna hulka", 30, 7, 40}, {"Nemrtvy Carodej", 20, 9, 20}},
+        {{"Demon", 40, 10, 35}},
         {{"MiniBoss Rytir", 30, 7, 30}},
-        {{"Plaguevile", 60, 12, 150}} // HLAVNI BOSS
+        {{"Drak", 80, 8, 100}},
+        {{"Plaguevile", 100, 12, 150}} // HLAVNI BOSS
     };
 // ------------ prubeh hry ------------
 for (int i = 0; i < mapa.size();i++){
@@ -474,8 +513,12 @@ for (int i = 0; i < mapa.size();i++){
         vesnice(postava, 1);
     if (i == 6)
         vesnice(postava, 2);
-    if (i == 7)
+    if (i == 9)
         vesnice(postava, 3);
+    if (i == 11)
+        vesnice(postava, 4);
+    if (i == 13)
+        vesnice(postava, 5);
     pribehSouboje(i);
     bool vysledek;
 // ------------ boss boj ------------
